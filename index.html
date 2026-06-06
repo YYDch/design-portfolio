@@ -504,7 +504,64 @@ a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat
   to { transform: scale(4); opacity: 0; }
 }
 
+
+/* ── 3D Earth Container ── */
+#earth-container {
+  position: absolute; right: 24px; top: 50%; transform: translateY(-50%);
+  width: 360px; height: 360px; z-index: 0; pointer-events: none;
+}
+#earth-container canvas { display: block; }
+
+/* ── Modal ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 20000;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 40px; max-width: 520px; width: 90%;
+  position: relative;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,212,255,0.15);
+}
+.modal-overlay.active .modal-card {
+  transform: scale(1) translateY(0);
+}
+.modal-close {
+  position: absolute; top: 16px; right: 20px;
+  background: none; border: none; color: var(--text-muted);
+  font-size: 1.8rem; cursor: pointer; line-height: 1;
+  transition: color 0.2s;
+}
+.modal-close:hover { color: var(--accent); }
+.modal-tag {
+  display: inline-block; font-size: 0.72rem; font-weight: 600;
+  color: var(--accent); background: rgba(0,212,255,0.08);
+  padding: 4px 12px; border-radius: 4px; margin-bottom: 16px;
+  letter-spacing: 0.05em; border: 1px solid rgba(0,212,255,0.15);
+}
+.modal-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 16px; }
+.modal-desc { color: var(--text-secondary); line-height: 1.8; font-size: 0.98rem; margin-bottom: 28px; }
+.modal-footer { display: flex; gap: 12px; }
+
+/* Earth responsive */
+@media (max-width: 768px) {
+  #earth-container { right: 50%; top: 280px; transform: translate(50%, 0); width: 220px; height: 220px; }
+  .hero { padding-bottom: 200px; }
+  .modal-card { padding: 28px 22px; }
+}
+
+/* Hero relative for earth positioning */
+.hero { position: relative; overflow: hidden; }
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
 </head>
 <body>
 
@@ -529,6 +586,7 @@ a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat
     <a href="#contact" class="btn btn-primary">INIT 连接</a>
     <a href="#works" class="btn btn-outline">VIEW 作品集</a>
   </div>
+<div id="earth-container"></div>
 </div>
 
 <section id="works">
@@ -665,197 +723,244 @@ a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat
 </footer>
 
 <script>
-// ═══════════════════════════
-//  GEN-Z INTERACTIONS ENGINE
-// ═══════════════════════════
+(function() {
+  if (typeof THREE === 'undefined') return;
+  const container = document.getElementById('earth-container');
+  if (!container) return;
+  const W = container.clientWidth, H = container.clientHeight;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+  camera.position.z = 7;
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(W, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+  const globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+  const sphereGeo = new THREE.SphereGeometry(1.8, 64, 64);
+  const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0a0a18 });
+  globeGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
+  const wireGeo = new THREE.SphereGeometry(1.82, 32, 32);
+  const wireMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, wireframe: true, transparent: true, opacity: 0.25 });
+  globeGroup.add(new THREE.Mesh(wireGeo, wireMat));
+  const dotsGeo = new THREE.BufferGeometry();
+  const dotCount = 400;
+  const dotsPos = new Float32Array(dotCount * 3);
+  for (let i = 0; i < dotCount; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 1.84;
+    dotsPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    dotsPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    dotsPos[i * 3 + 2] = r * Math.cos(phi);
+  }
+  dotsGeo.setAttribute('position', new THREE.BufferAttribute(dotsPos, 3));
+  globeGroup.add(new THREE.Points(dotsGeo, new THREE.PointsMaterial({ color: 0x00d4ff, size: 0.025, transparent: true, opacity: 0.7 })));
+  const orbits = [
+    { tilt: 0, speed: 0.3, count: 120, radius: 2.4, color: 0x00d4ff, opacity: 0.6 },
+    { tilt: 55, speed: -0.4, count: 100, radius: 2.6, color: 0x7c5cfc, opacity: 0.5 },
+    { tilt: -35, speed: 0.5, count: 90, radius: 2.55, color: 0x00e8ff, opacity: 0.55 },
+    { tilt: 70, speed: -0.25, count: 80, radius: 2.8, color: 0x5ce0ff, opacity: 0.4 }
+  ];
+  const ringParticles = [];
+  orbits.forEach(orbit => {
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(orbit.count * 3);
+    for (let i = 0; i < orbit.count; i++) {
+      const angle = (Math.PI * 2 * i) / orbit.count + Math.random() * 0.3;
+      pos[i * 3] = Math.cos(angle) * orbit.radius;
+      pos[i * 3 + 2] = Math.sin(angle) * orbit.radius;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const ring = new THREE.Points(geo, new THREE.PointsMaterial({ color: orbit.color, size: 0.04, transparent: true, opacity: orbit.opacity }));
+    ring.rotation.x = THREE.MathUtils.degToRad(orbit.tilt);
+    ring.userData = { speed: orbit.speed };
+    globeGroup.add(ring);
+    ringParticles.push(ring);
+  });
+  const ambientGeo = new THREE.BufferGeometry();
+  const ac = 200;
+  const ap = new Float32Array(ac * 3);
+  for (let i = 0; i < ac; i++) {
+    ap[i * 3] = (Math.random() - 0.5) * 8;
+    ap[i * 3 + 1] = (Math.random() - 0.5) * 8;
+    ap[i * 3 + 2] = (Math.random() - 0.5) * 8;
+  }
+  ambientGeo.setAttribute('position', new THREE.BufferAttribute(ap, 3));
+  const ambient = new THREE.Points(ambientGeo, new THREE.PointsMaterial({ color: 0x00d4ff, size: 0.015, transparent: true, opacity: 0.3 }));
+  scene.add(ambient);
+  (function anim() {
+    requestAnimationFrame(anim);
+    globeGroup.rotation.y += 0.002;
+    globeGroup.rotation.x += 0.0005;
+    ringParticles.forEach(r => r.rotation.z += r.userData.speed * 0.01);
+    ambient.rotation.y += 0.0003;
+    ambient.rotation.x += 0.0002;
+    renderer.render(scene, camera);
+  })();
+  window.addEventListener('resize', () => {
+    const w = container.clientWidth, h = container.clientHeight;
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+})();
 
-// ── Custom Cursor ──
+// Modal
+const modal = document.getElementById('modal');
+const modalTag = document.getElementById('modal-tag');
+const modalTitle = document.getElementById('modal-title');
+const modalDesc = document.getElementById('modal-desc');
+const cardDescs = {"VOID TEA · 品牌系统":"为高端茶饮品牌打造的完整视觉识别系统。从Logo到包装，从店招到社交媒体模板，用极简线条和深空蓝传递「空与满」的品牌哲学。交付周期：5天。客户反馈：「比我想象的更懂茶。」","NEON MILK · 促销视觉":"奶茶品牌春日上新全案。赛博朋克 × 奶茶的碰撞——荧光粉蓝撞色、故障艺术字体、动态海报三件套。上线首周门店客流提升30%。","FASHION_FWD · 封面矩阵":"为穿搭博主定制的20套小红书封面模板。按季节、风格、场景分类，博主直接套用换图即可。统一视觉语言后账号涨粉速度提升2倍。","PROTO-BAKE · VI系统":"精品烘焙品牌的从零到一。Logo以面团发酵的圆润形态为原型，配色取小麦金黄与窑炉暗红。全套VI含Logo/名片/包装袋/围裙/价签。","NOODLE://001 · 菜单引擎":"街边面馆的菜单升级——从一张白纸打印变成三折页设计。重点突出招牌面和价格，用大图+大字+清晰分区让食客3秒找到想吃的那碗。","PITCH_DECK · BP重构":"创业团队路演PPT全面美化。原版PPT信息密集、视觉混乱。重构后采用每页一个核心数据的设计法则，配合品牌色系统，路演当天获得TS。","小红书封面系统":"多赛道模板库：穿搭/美食/母婴/职场/探店。风格一键匹配，AI辅助生成标题文案。平均3小时出图，支持无限改稿。最适合每天需要更新的博主。","品牌标识引擎":"三套方案并行输出，你选一套深化到满意。附赠品牌口号一句。非模板化设计，每个Logo根据品牌故事定制。适合新品牌从0到1的视觉定义。","营销视觉输出":"覆盖开业/促销/节日/活动四大场景。海报+传单+朋友圈九宫格+小红书封面，线上线下双版本自适应。配套营销文案，一站式交付。","AI文案引擎":"品牌故事/产品文案/小红书笔记/公众号推文/朋友圈营销——按渠道风格定制。不只是写，还会帮你规划内容节奏和标题策略。"};
+function openModal(title, tag, desc) {
+  modalTag.textContent = tag; modalTitle.textContent = title; modalDesc.textContent = desc;
+  modal.classList.add('active'); document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  modal.classList.remove('active'); document.body.style.overflow = '';
+}
+document.querySelector('.modal-close').addEventListener('click', closeModal);
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+document.querySelectorAll('.portfolio-card, .service-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    const title = card.querySelector('.card-title, .svc-title')?.textContent?.trim() || '';
+    const tag = card.querySelector('.card-tag')?.textContent?.trim() || '';
+    openModal(title, tag, cardDescs[title] || '详细内容即将上线，欢迎通过微信咨询具体案例和报价。');
+  });
+});
+
+// Custom Cursor
 const dot = document.createElement('div'); dot.className = 'cursor-dot';
 const ring = document.createElement('div'); ring.className = 'cursor-ring';
 document.body.appendChild(dot); document.body.appendChild(ring);
-
-let mouseX = 0, mouseY = 0;
-let dotX = 0, dotY = 0;
-let ringX = 0, ringY = 0;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX; mouseY = e.clientY;
-  dot.style.left = mouseX + 'px';
-  dot.style.top = mouseY + 'px';
-});
-
-function animateCursor() {
-  ringX += (mouseX - ringX) * 0.15;
-  ringY += (mouseY - ringY) * 0.15;
-  ring.style.left = ringX + 'px';
-  ring.style.top = ringY + 'px';
-  requestAnimationFrame(animateCursor);
-}
-animateCursor();
-
-// Hover detection
-const hoverTargets = document.querySelectorAll('a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat');
-hoverTargets.forEach(el => {
+let mx = 0, my = 0;
+document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; dot.style.left = mx + 'px'; dot.style.top = my + 'px'; });
+(function ac() {
+  const rx = parseFloat(ring.style.left) || mx, ry = parseFloat(ring.style.top) || my;
+  ring.style.left = (rx + (mx - rx) * 0.15) + 'px'; ring.style.top = (ry + (my - ry) * 0.15) + 'px';
+  requestAnimationFrame(ac);
+})();
+document.querySelectorAll('a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat, .modal-close').forEach(el => {
   el.addEventListener('mouseenter', () => { dot.classList.add('hover'); ring.classList.add('hover'); });
   el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); ring.classList.remove('hover'); });
 });
 
-// ── Click Particle Burst ──
+// Click burst
 document.addEventListener('click', (e) => {
-  const count = 12;
-  for (let i = 0; i < count; i++) {
-    const p = document.createElement('div');
-    p.className = 'click-particle';
-    const angle = (Math.PI * 2 * i) / count;
-    const dist = 30 + Math.random() * 40;
-    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-    p.style.left = e.clientX + 'px';
-    p.style.top = e.clientY + 'px';
-    p.style.background = i % 2 === 0 ? 'var(--accent)' : '#fff';
-    p.style.width = (3 + Math.random() * 4) + 'px';
-    p.style.height = p.style.width;
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div'); p.className = 'click-particle';
+    const a = (Math.PI * 2 * i) / 12, d = 30 + Math.random() * 40;
+    p.style.setProperty('--dx', Math.cos(a) * d + 'px');
+    p.style.setProperty('--dy', Math.sin(a) * d + 'px');
+    p.style.left = e.clientX + 'px'; p.style.top = e.clientY + 'px';
+    p.style.background = i % 2 ? 'var(--accent)' : '#fff';
+    p.style.width = p.style.height = (3 + Math.random() * 4) + 'px';
     document.body.appendChild(p);
     setTimeout(() => p.remove(), 700);
   }
-
-  // Ripple on buttons
   if (e.target.closest('.btn')) {
-    const btn = e.target.closest('.btn');
-    const ripple = document.createElement('span');
-    ripple.className = 'btn-ripple';
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-    btn.style.position = btn.style.position || 'relative';
-    btn.style.overflow = 'hidden';
-    btn.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
+    const btn = e.target.closest('.btn'), rp = document.createElement('span');
+    rp.className = 'btn-ripple'; const rect = btn.getBoundingClientRect();
+    const s = Math.max(rect.width, rect.height);
+    rp.style.width = rp.style.height = s + 'px';
+    rp.style.left = (e.clientX - rect.left - s / 2) + 'px';
+    rp.style.top = (e.clientY - rect.top - s / 2) + 'px';
+    btn.style.position = 'relative'; btn.style.overflow = 'hidden';
+    btn.appendChild(rp); setTimeout(() => rp.remove(), 600);
   }
 });
 
-// ── 3D Card Tilt ──
+// 3D Tilt
 document.querySelectorAll('.portfolio-card').forEach(card => {
   card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const rotateX = ((y - cy) / cy) * -8;
-    const rotateY = ((x - cx) / cx) * 8;
-    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    const r = card.getBoundingClientRect(), cx = r.width / 2, cy = r.height / 2;
+    card.style.transform = `perspective(800px) rotateX(${((e.clientY - r.top - cy) / cy) * -8}deg) rotateY(${((e.clientX - r.left - cx) / cx) * 8}deg)`;
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
-  });
+  card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)'; });
 });
-
-// ── Magnetic Buttons ──
-document.querySelectorAll('.btn').forEach(btn => {
-  btn.addEventListener('mousemove', (e) => {
-    const rect = btn.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
-  });
-  btn.addEventListener('mouseleave', () => {
-    btn.style.transform = 'translate(0, 0)';
-  });
-});
-
-// ── Service Card Tilt ──
 document.querySelectorAll('.service-card').forEach(card => {
   card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const rotateX = ((y - cy) / cy) * -5;
-    const rotateY = ((x - cx) / cx) * 5;
-    card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    const r = card.getBoundingClientRect(), cx = r.width / 2, cy = r.height / 2;
+    card.style.transform = `perspective(600px) rotateX(${((e.clientY - r.top - cy) / cy) * -5}deg) rotateY(${((e.clientX - r.left - cx) / cx) * 5}deg)`;
   });
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
-  });
+  card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)'; });
 });
 
-// ── Counter Animation ──
-const counterObserver = new IntersectionObserver((entries) => {
+// Magnetic buttons
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const r = btn.getBoundingClientRect();
+    btn.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.15}px, ${(e.clientY - r.top - r.height / 2) * 0.15}px)`;
+  });
+  btn.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0,0)'; });
+});
+
+// Counters
+const co = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const el = entry.target;
-      const targetText = el.textContent;
-      const targetNum = parseInt(targetText);
-      if (isNaN(targetNum)) return;
-      const suffix = targetText.replace(/[0-9]/g, '');
-      const duration = 1500;
-      const start = performance.now();
-      el.classList.add('counting');
-      function tick(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        // Ease out cubic
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(eased * targetNum);
-        el.textContent = current + suffix;
-        if (progress < 1) requestAnimationFrame(tick);
-        else { el.textContent = targetText; el.classList.remove('counting'); }
-      }
-      requestAnimationFrame(tick);
-      counterObserver.unobserve(el);
-    }
+    if (!entry.isIntersecting) return;
+    const el = entry.target, txt = el.textContent, num = parseInt(txt);
+    if (isNaN(num)) return;
+    const sfx = txt.replace(/[0-9]/g, ''), st = performance.now();
+    el.classList.add('counting');
+    (function tk(now) {
+      const p = Math.min((now - st) / 1500, 1), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(e * num) + sfx;
+      if (p < 1) requestAnimationFrame(tk);
+      else { el.textContent = txt; el.classList.remove('counting'); }
+    })(st);
+    co.unobserve(el);
   });
 }, { threshold: 0.5 });
+document.querySelectorAll('.highlight-box .number').forEach(el => co.observe(el));
 
-document.querySelectorAll('.highlight-box .number').forEach(el => {
-  counterObserver.observe(el);
+// Hero parallax
+const h1 = document.querySelector('.hero h1');
+if (h1) document.addEventListener('mousemove', (e) => {
+  h1.style.transform = `translate(${(e.clientX / window.innerWidth - 0.5) * 10}px, ${(e.clientY / window.innerHeight - 0.5) * 10}px)`;
 });
 
-// ── Hero Parallax ──
-const heroH1 = document.querySelector('.hero h1');
-if (heroH1) {
-  document.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 10;
-    const y = (e.clientY / window.innerHeight - 0.5) * 10;
-    heroH1.style.transform = `translate(${x}px, ${y}px)`;
-  });
-}
-
-// ── Typewriter ──
+// Typewriter
 const phrases = ['数字视觉设计 · AI文案引擎', '品牌系统构建中...', '视觉+文字 完整交付', 'SYS::READY'];
-let phraseIdx = 0, charIdx = 0, isDeleting = false;
+let pi = 0, ci = 0, del = false;
 const tw = document.getElementById('typewriter');
-function type() {
-  const current = phrases[phraseIdx];
-  tw.textContent = isDeleting
-    ? current.substring(0, Math.max(0, charIdx - 1))
-    : current.substring(0, charIdx + 1);
-  if (isDeleting) charIdx--; else charIdx++;
-  if (!isDeleting && charIdx === current.length) setTimeout(() => { isDeleting = true; }, 2000);
-  else if (isDeleting && charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; }
-  setTimeout(type, isDeleting ? 35 : 75);
-}
-type();
+(function type() {
+  const cur = phrases[pi];
+  tw.textContent = del ? cur.substring(0, Math.max(0, ci - 1)) : cur.substring(0, ci + 1);
+  if (del) ci--; else ci++;
+  if (!del && ci === cur.length) setTimeout(() => { del = true; }, 2000);
+  else if (del && ci === 0) { del = false; pi = (pi + 1) % phrases.length; }
+  setTimeout(type, del ? 35 : 75);
+})();
 
-// ── Scroll Reveal ──
-const revealEls = document.querySelectorAll('.portfolio-card, .service-card, .highlight-box, .section-title, .section-desc, .section-label');
-const scrollObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) entry.target.classList.add('visible');
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
-revealEls.forEach(el => { el.classList.add('reveal'); scrollObserver.observe(el); });
+// Scroll reveal
+const ro = document.querySelectorAll('.portfolio-card, .service-card, .highlight-box, .section-title, .section-desc, .section-label');
+const so = new IntersectionObserver((es) => { es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+ro.forEach(el => { el.classList.add('reveal'); so.observe(el); });
 
-// ── Smooth Scroll ──
+// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
+    e.preventDefault(); closeModal();
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth' });
   });
 });
 </script>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-card">
+    <button class="modal-close">&times;</button>
+    <div class="modal-tag" id="modal-tag"></div>
+    <h2 class="modal-title" id="modal-title"></h2>
+    <p class="modal-desc" id="modal-desc"></p>
+    <div class="modal-footer">
+      <a href="#contact" class="btn btn-primary modal-cta">发起连接请求</a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
