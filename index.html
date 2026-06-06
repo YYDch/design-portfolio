@@ -6,19 +6,23 @@
 <title>你的名字 | 品牌设计 · 文案策划</title>
 <style>
 :root {
-  --bg: #fafafa;
-  --surface: #ffffff;
-  --text: #1a1a1a;
-  --text-secondary: #555555;
-  --text-muted: #888888;
-  --accent: #c75b4a;
-  --accent-hover: #a8483a;
-  --border: #e8e8e8;
-  --border-light: #f0f0f0;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --bg: #08080e;
+  --bg-alt: #0c0c14;
+  --surface: #111118;
+  --surface-hover: #181822;
+  --text: #e4e4ec;
+  --text-secondary: #a0a0b8;
+  --text-muted: #666680;
+  --accent: #00d4ff;
+  --accent-glow: rgba(0,212,255,0.25);
+  --accent-hover: #00e8ff;
+  --accent2: #7c5cfc;
+  --border: #1e1e2e;
+  --border-light: #181825;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
   --max-width: 1080px;
   --nav-height: 60px;
 }
@@ -35,13 +39,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Nav */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
 nav {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(250,250,250,0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-light);
+  background: rgba(8,8,14,0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
   height: var(--nav-height);
   display: flex; align-items: center;
 }
@@ -49,70 +61,99 @@ nav {
   max-width: var(--max-width); width: 100%; margin: 0 auto;
   padding: 0 24px;
   display: flex; justify-content: space-between; align-items: center;
+  position: relative; z-index: 1;
 }
 .nav-logo {
-  font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+  font-size: 1.1rem; font-weight: 700; letter-spacing: 0.02em;
   color: var(--text); text-decoration: none;
 }
 .nav-links { display: flex; gap: 28px; list-style: none; }
 .nav-links a {
-  font-size: 0.875rem; color: var(--text-secondary); text-decoration: none;
-  transition: color 0.2s; font-weight: 500;
+  font-size: 0.85rem; color: var(--text-muted); text-decoration: none;
+  transition: color 0.25s; font-weight: 500; letter-spacing: 0.02em;
 }
 .nav-links a:hover { color: var(--accent); }
 
-/* Section */
 section {
   max-width: var(--max-width); margin: 0 auto;
   padding: 80px 24px;
+  position: relative; z-index: 1;
 }
 .section-label {
-  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--accent); margin-bottom: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-label::before {
+  content: '';
+  display: inline-block; width: 20px; height: 1px;
+  background: var(--accent);
 }
 .section-title {
-  font-size: 2rem; font-weight: 700; letter-spacing: -0.03em;
+  font-size: 2rem; font-weight: 700; letter-spacing: -0.02em;
   margin-bottom: 16px; line-height: 1.25;
 }
 .section-desc {
-  font-size: 1.05rem; color: var(--text-secondary);
+  font-size: 1rem; color: var(--text-secondary);
   max-width: 520px; margin-bottom: 48px;
 }
 
-/* Hero */
 .hero {
   padding: 100px 24px 80px;
   max-width: var(--max-width); margin: 0 auto;
   display: flex; flex-direction: column; gap: 32px;
+  position: relative; z-index: 1;
 }
 .hero-tag {
-  display: inline-block;
-  background: #fdf0ee; color: var(--accent);
-  font-size: 0.8rem; font-weight: 600; padding: 6px 14px; border-radius: 20px;
-  letter-spacing: 0.04em; width: fit-content;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,212,255,0.08); color: var(--accent);
+  font-size: 0.78rem; font-weight: 600; padding: 6px 16px; border-radius: 20px;
+  letter-spacing: 0.06em; width: fit-content;
+  border: 1px solid rgba(0,212,255,0.2);
 }
-.hero h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.15; }
-.hero .subtitle { font-size: 1.3rem; color: var(--text-secondary); font-weight: 400; }
+.hero-tag::before {
+  content: '';
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.hero h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+.hero .subtitle {
+  font-size: 1.25rem; color: var(--text-secondary); font-weight: 400;
+  letter-spacing: 0.04em;
+}
 .hero .desc {
-  font-size: 1.08rem; color: var(--text-secondary); max-width: 560px; line-height: 1.8;
+  font-size: 1.05rem; color: var(--text-muted); max-width: 560px; line-height: 1.8;
 }
-.hero-cta {
-  display: flex; gap: 14px; flex-wrap: wrap;
-}
+.hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 12px 26px; border-radius: var(--radius-sm);
-  font-size: 0.95rem; font-weight: 600; cursor: pointer; text-decoration: none;
-  transition: all 0.2s; border: none; letter-spacing: -0.01em;
+  font-size: 0.92rem; font-weight: 600; cursor: pointer; text-decoration: none;
+  transition: all 0.25s; border: none; letter-spacing: 0.01em;
 }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-primary {
+  background: var(--accent); color: #08080e;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0,212,255,0.35);
+}
 .btn-outline {
-  background: transparent; color: var(--text); border: 1.5px solid var(--border);
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border);
 }
-.btn-outline:hover { border-color: var(--text-secondary); }
+.btn-outline:hover {
+  border-color: var(--accent); color: var(--accent);
+}
 
-/* Portfolio */
 .portfolio-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -120,43 +161,53 @@ section {
 }
 .portfolio-card {
   background: var(--surface); border-radius: var(--radius);
-  overflow: hidden; border: 1px solid var(--border-light);
+  overflow: hidden; border: 1px solid var(--border);
   transition: all 0.3s; cursor: pointer;
 }
 .portfolio-card:hover {
-  transform: translateY(-4px); box-shadow: var(--shadow-md);
-  border-color: var(--border);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.15);
+  border-color: rgba(0,212,255,0.3);
 }
 .portfolio-card .card-img {
   height: 200px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem; font-weight: 700; color: #fff;
+  font-size: 1.4rem; font-weight: 700; color: #fff;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+}
+.portfolio-card .card-img::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.4) 100%);
 }
 .portfolio-card .card-body { padding: 18px 20px 20px; }
 .portfolio-card .card-tag {
-  display: inline-block; font-size: 0.72rem; font-weight: 600;
-  color: var(--accent); background: #fdf0ee;
+  display: inline-block; font-size: 0.7rem; font-weight: 600;
+  color: var(--accent); background: rgba(0,212,255,0.08);
   padding: 3px 10px; border-radius: 4px; margin-bottom: 8px;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em; border: 1px solid rgba(0,212,255,0.15);
 }
 .portfolio-card .card-title {
   font-size: 1.05rem; font-weight: 600; color: var(--text);
 }
 
-/* Services */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 .service-card {
-  background: var(--surface); border: 1px solid var(--border-light);
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 32px 24px;
   transition: all 0.3s;
 }
 .service-card:hover {
-  transform: translateY(-3px); box-shadow: var(--shadow-md);
-  border-color: var(--border);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  border-color: rgba(0,212,255,0.25);
+  background: var(--surface-hover);
 }
 .service-card .svc-icon {
   width: 44px; height: 44px; border-radius: 10px;
@@ -169,32 +220,35 @@ section {
   margin-bottom: 8px;
 }
 .service-card .svc-desc {
-  font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;
+  font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;
 }
 
-/* About */
 .about-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
 }
-.about-text p { color: var(--text-secondary); margin-bottom: 18px; font-size: 1.02rem; }
+.about-text p { color: var(--text-secondary); margin-bottom: 18px; font-size: 1rem; }
 .tool-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
 .tool-tag {
-  background: #f3f3f3; border-radius: 6px;
-  padding: 6px 14px; font-size: 0.82rem; color: var(--text-secondary); font-weight: 500;
+  background: var(--surface); border-radius: 6px; border: 1px solid var(--border);
+  padding: 6px 14px; font-size: 0.8rem; color: var(--text-secondary); font-weight: 500;
 }
 .about-highlights {
   display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
 }
 .highlight-box {
-  background: var(--surface); border: 1px solid var(--border-light);
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 24px; text-align: center;
+  transition: all 0.3s;
+}
+.highlight-box:hover {
+  border-color: rgba(0,212,255,0.3);
+  box-shadow: 0 0 20px rgba(0,212,255,0.06);
 }
 .highlight-box .number { font-size: 2rem; font-weight: 800; color: var(--accent); }
-.highlight-box .label { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+.highlight-box .label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
 
-/* Contact */
 .contact-box {
-  background: var(--surface); border: 1px solid var(--border-light);
+  background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 48px;
   text-align: center; max-width: 560px; margin: 0 auto;
 }
@@ -202,30 +256,31 @@ section {
 .contact-box p { color: var(--text-secondary); margin-bottom: 24px; }
 .contact-wechat {
   display: inline-flex; align-items: center; gap: 10px;
-  background: #f3f3f3; border-radius: var(--radius-sm);
+  background: var(--surface-hover); border-radius: var(--radius-sm);
   padding: 14px 28px; font-size: 1.05rem; font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--accent);
 }
 
-/* Footer */
 footer {
-  text-align: center; padding: 40px 24px;
-  color: var(--text-muted); font-size: 0.82rem;
-  border-top: 1px solid var(--border-light);
+  text-align: center; padding: 40px 24px 60px;
+  color: var(--text-muted); font-size: 0.8rem;
+  border-top: 1px solid var(--border);
   max-width: var(--max-width); margin: 0 auto;
+  position: relative; z-index: 1;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .hero { padding: 60px 20px 50px; }
   .hero h1 { font-size: 2.2rem; }
-  .hero .subtitle { font-size: 1.1rem; }
+  .hero .subtitle { font-size: 1.05rem; }
   section { padding: 60px 20px; }
   .section-title { font-size: 1.6rem; }
   .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .about-grid { grid-template-columns: 1fr; gap: 40px; }
   .nav-links { gap: 18px; }
-  .nav-links a { font-size: 0.8rem; }
+  .nav-links a { font-size: 0.78rem; }
 }
 
 @media (max-width: 480px) {
@@ -271,42 +326,42 @@ footer {
   <p class="section-desc">持续更新中。点击任意作品可查看完整详情。</p>
   <div class="portfolio-grid">
     <div class="portfolio-card">
-      <div class="card-img" style="background:#3b4f61;">Logo设计</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#0a1628,#0a1628dd);">Logo设计</div>
       <div class="card-body">
         <span class="card-tag">Logo设计</span>
         <div class="card-title">山隐茶馆 · 品牌标识</div>
       </div>
     </div>
     <div class="portfolio-card">
-      <div class="card-img" style="background:#7d5a50;">海报设计</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#120e24,#120e24dd);">海报设计</div>
       <div class="card-body">
         <span class="card-tag">海报设计</span>
         <div class="card-title">春日上新 · 奶茶促销海报</div>
       </div>
     </div>
     <div class="portfolio-card">
-      <div class="card-img" style="background:#c75b4a;">小红书封面</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#0a1a24,#0a1a24dd);">小红书封面</div>
       <div class="card-body">
         <span class="card-tag">小红书封面</span>
         <div class="card-title">穿搭博主 · 封面模板套系</div>
       </div>
     </div>
     <div class="portfolio-card">
-      <div class="card-img" style="background:#4a6b5d;">品牌VI</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#12102a,#12102add);">品牌VI</div>
       <div class="card-body">
         <span class="card-tag">品牌VI</span>
         <div class="card-title">初见烘焙 · 全套视觉</div>
       </div>
     </div>
     <div class="portfolio-card">
-      <div class="card-img" style="background:#2e3b4e;">菜单设计</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#0c1822,#0c1822dd);">菜单设计</div>
       <div class="card-body">
         <span class="card-tag">菜单设计</span>
         <div class="card-title">一味面馆 · 折页菜单</div>
       </div>
     </div>
     <div class="portfolio-card">
-      <div class="card-img" style="background:#9b6b5e;">PPT美化</div>
+      <div class="card-img" style="background:linear-gradient(135deg,#140e24,#140e24dd);">PPT美化</div>
       <div class="card-body">
         <span class="card-tag">PPT美化</span>
         <div class="card-title">创业路演 · BP视觉优化</div>
@@ -321,25 +376,25 @@ footer {
   <p class="section-desc">每项服务都包含文案配套建议，不像普通设计师只出图不管字。</p>
   <div class="services-grid">
     <div class="service-card">
-      <div class="svc-icon" style="background:#fdf0ee;">🎨</div>
+      <div class="svc-icon" style="background:linear-gradient(135deg,#0a1628,#0a1628dd);">🎨</div>
       <div class="svc-title">小红书封面设计</div>
       <div class="svc-price">¥39起</div>
       <div class="svc-desc">穿搭/美食/母婴/职场，各赛道风格适配，含标题文案优化建议</div>
     </div>
     <div class="service-card">
-      <div class="svc-icon" style="background:#eef4f0;">✦</div>
+      <div class="svc-icon" style="background:linear-gradient(135deg,#120e24,#120e24dd);">✦</div>
       <div class="svc-title">品牌Logo设计</div>
       <div class="svc-price">¥199起</div>
       <div class="svc-desc">提供3版初稿，选一深化至满意，附赠品牌口号一句</div>
     </div>
     <div class="service-card">
-      <div class="svc-icon" style="background:#f5f0ea;">📋</div>
+      <div class="svc-icon" style="background:linear-gradient(135deg,#0a1a24,#0a1a24dd);">📋</div>
       <div class="svc-title">海报与传单设计</div>
       <div class="svc-price">¥99起</div>
       <div class="svc-desc">开业/促销/活动海报，配促销文案，线上线下两版适配</div>
     </div>
     <div class="service-card">
-      <div class="svc-icon" style="background:#eef1f5;">✎</div>
+      <div class="svc-icon" style="background:linear-gradient(135deg,#12102a,#12102add);">✎</div>
       <div class="svc-title">品牌文案策划</div>
       <div class="svc-price">¥199起</div>
       <div class="svc-desc">品牌故事/产品文案/公众号推文/小红书笔记，按渠道定制</div>
