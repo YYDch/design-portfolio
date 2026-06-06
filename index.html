@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>你的名字 | 品牌设计 · 文案策划</title>
+<title>DESIGNER-X | 数字视觉 · 智能文案</title>
 <style>
 :root {
   --bg: #08080e;
@@ -290,131 +290,232 @@ footer {
   .contact-box { padding: 32px 20px; }
   .nav-links { gap: 14px; }
 }
+
+/* ── Tech interaction additions ── */
+
+/* Nav accent dot */
+.accent-dot { color: var(--accent); font-weight: 800; }
+
+/* Hero highlight */
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Typewriter cursor */
+#typewriter::after {
+  content: '▎';
+  color: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glitch hover on cards */
+.portfolio-card { position: relative; }
+.portfolio-card::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  border-radius: var(--radius);
+  opacity: 0;
+  transition: opacity 0.2s;
+  background: linear-gradient(120deg,
+    transparent 0%, rgba(0,212,255,0.06) 30%,
+    rgba(124,92,252,0.04) 70%, transparent 100%);
+}
+.portfolio-card:hover::before { opacity: 1; }
+
+/* Service card tech border */
+.service-card { position: relative; overflow: hidden; }
+.service-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.service-card:hover::after { opacity: 1; }
+
+/* Scan line overlay (subtle) */
+.hero { position: relative; }
+.hero::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  opacity: 0.4;
+}
+.hero > * { position: relative; z-index: 1; }
+
+/* Mouse glow trail on body */
+.glow-trail {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.4s;
+  opacity: 0;
+}
+
+/* Nav ::before circuit line */
+nav::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(0,212,255,0.3) 20%,
+    rgba(0,212,255,0.1) 50%, transparent 100%);
+}
+
+/* Section label tech style */
+.section-label { font-family: 'Courier New', monospace; }
+
+/* Contact glitch border */
+.contact-box { position: relative; overflow: hidden; }
+.contact-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-logo">你的名字</a>
+    <a href="#" class="nav-logo">D<span class="accent-dot">·</span>X</a>
     <ul class="nav-links">
-      <li><a href="#works">作品</a></li>
-      <li><a href="#services">服务</a></li>
-      <li><a href="#about">关于</a></li>
-      <li><a href="#contact">联系</a></li>
+      <li><a href="#works">/ / 作品</a></li>
+      <li><a href="#services">/ / 服务</a></li>
+      <li><a href="#about">/ / 关于</a></li>
+      <li><a href="#contact">/ / 联系</a></li>
     </ul>
   </div>
 </nav>
 
 <div class="hero">
-  <span class="hero-tag">开放接单中</span>
-  <h1>让每个品牌<br>都有好看的样子</h1>
-  <p class="subtitle">品牌设计 · 文案策划</p>
-  <p class="desc">
-    帮小商家、博主、创业者做出让人一眼记住的品牌视觉和文案。
-    从Logo到小红书封面，从海报到品牌口号——打包搞定，省心不贵。
-  </p>
+  <span class="hero-tag">SYS::ONLINE — 接收任务中</span>
+  <h1>用<span class="highlight">代码思维</span><br>做品牌视觉</h1>
+  <p class="subtitle" id="typewriter"></p>
+  <p class="desc">融合设计美学与AI辅助文案，为品牌输出视觉 + 文字的完整解决方案。Logo / VI / 海报 / 小红书封面 / 品牌文案 — 一键打包交付。</p>
   <div class="hero-cta">
-    <a href="#contact" class="btn btn-primary">免费咨询</a>
-    <a href="#works" class="btn btn-outline">看作品</a>
+    <a href="#contact" class="btn btn-primary">INIT 连接</a>
+    <a href="#works" class="btn btn-outline">VIEW 作品集</a>
   </div>
 </div>
 
 <section id="works">
-  <p class="section-label">作品案例</p>
-  <h2 class="section-title">近期的设计作品</h2>
-  <p class="section-desc">持续更新中。点击任意作品可查看完整详情。</p>
+  <p class="section-label">/ / PORTFOLIO</p>
+  <h2 class="section-title">输出日志</h2>
+  <p class="section-desc">系统运行中，持续输出。点击模块查看完整案例。</p>
   <div class="portfolio-grid">
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#0a1628,#0a1628dd);">Logo设计</div>
       <div class="card-body">
         <span class="card-tag">Logo设计</span>
-        <div class="card-title">山隐茶馆 · 品牌标识</div>
+        <div class="card-title">VOID TEA · 品牌系统</div>
       </div>
     </div>
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#120e24,#120e24dd);">海报设计</div>
       <div class="card-body">
         <span class="card-tag">海报设计</span>
-        <div class="card-title">春日上新 · 奶茶促销海报</div>
+        <div class="card-title">NEON MILK · 促销视觉</div>
       </div>
     </div>
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#0a1a24,#0a1a24dd);">小红书封面</div>
       <div class="card-body">
         <span class="card-tag">小红书封面</span>
-        <div class="card-title">穿搭博主 · 封面模板套系</div>
+        <div class="card-title">FASHION_FWD · 封面矩阵</div>
       </div>
     </div>
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#12102a,#12102add);">品牌VI</div>
       <div class="card-body">
         <span class="card-tag">品牌VI</span>
-        <div class="card-title">初见烘焙 · 全套视觉</div>
+        <div class="card-title">PROTO-BAKE · VI系统</div>
       </div>
     </div>
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#0c1822,#0c1822dd);">菜单设计</div>
       <div class="card-body">
         <span class="card-tag">菜单设计</span>
-        <div class="card-title">一味面馆 · 折页菜单</div>
+        <div class="card-title">NOODLE://001 · 菜单引擎</div>
       </div>
     </div>
     <div class="portfolio-card">
       <div class="card-img" style="background:linear-gradient(135deg,#140e24,#140e24dd);">PPT美化</div>
       <div class="card-body">
         <span class="card-tag">PPT美化</span>
-        <div class="card-title">创业路演 · BP视觉优化</div>
+        <div class="card-title">PITCH_DECK · BP重构</div>
       </div>
     </div>
   </div>
 </section>
 
 <section id="services">
-  <p class="section-label">服务与报价</p>
-  <h2 class="section-title">我能帮你做的事</h2>
-  <p class="section-desc">每项服务都包含文案配套建议，不像普通设计师只出图不管字。</p>
+  <p class="section-label">/ / SERVICES</p>
+  <h2 class="section-title">能力矩阵</h2>
+  <p class="section-desc">所有服务均包含AI辅助文案优化，设计 + 文字同步交付。</p>
   <div class="services-grid">
     <div class="service-card">
       <div class="svc-icon" style="background:linear-gradient(135deg,#0a1628,#0a1628dd);">🎨</div>
-      <div class="svc-title">小红书封面设计</div>
+      <div class="svc-title">小红书封面系统</div>
       <div class="svc-price">¥39起</div>
-      <div class="svc-desc">穿搭/美食/母婴/职场，各赛道风格适配，含标题文案优化建议</div>
+      <div class="svc-desc">多赛道模板库 + AI标题生成，风格一键匹配，3h极速出图</div>
     </div>
     <div class="service-card">
       <div class="svc-icon" style="background:linear-gradient(135deg,#120e24,#120e24dd);">✦</div>
-      <div class="svc-title">品牌Logo设计</div>
+      <div class="svc-title">品牌标识引擎</div>
       <div class="svc-price">¥199起</div>
-      <div class="svc-desc">提供3版初稿，选一深化至满意，附赠品牌口号一句</div>
+      <div class="svc-desc">生成3套方案，选1精修，赠送品牌Slogan文案</div>
     </div>
     <div class="service-card">
       <div class="svc-icon" style="background:linear-gradient(135deg,#0a1a24,#0a1a24dd);">📋</div>
-      <div class="svc-title">海报与传单设计</div>
+      <div class="svc-title">营销视觉输出</div>
       <div class="svc-price">¥99起</div>
-      <div class="svc-desc">开业/促销/活动海报，配促销文案，线上线下两版适配</div>
+      <div class="svc-desc">开业/促销/活动海报，配套营销文案，线上+线下双版</div>
     </div>
     <div class="service-card">
       <div class="svc-icon" style="background:linear-gradient(135deg,#12102a,#12102add);">✎</div>
-      <div class="svc-title">品牌文案策划</div>
+      <div class="svc-title">AI文案引擎</div>
       <div class="svc-price">¥199起</div>
-      <div class="svc-desc">品牌故事/产品文案/公众号推文/小红书笔记，按渠道定制</div>
+      <div class="svc-desc">品牌故事 / 产品文案 / 小红书 / 公众号，全渠道适配</div>
     </div>
   </div>
 </section>
 
 <section id="about">
-  <p class="section-label">关于我</p>
-  <h2 class="section-title">设计 + 文案，一个人就是一支团队</h2>
+  <p class="section-label">/ / SYSTEM</p>
+  <h2 class="section-title">DESIGNER-X // 版本 2.0</h2>
   <div class="about-grid">
     <div class="about-text">
-      <p>你好，我是一名独立设计师兼文案策划。与大部分纯设计师不同——我不只是让画面好看，我更在意画面上的每一个字是不是在帮你说服客户。</p>
-      <p>我相信对小商家和博主来说，设计不需要华丽炫技，而是干净、清晰、能一眼看出「这是谁」「在卖什么」「为什么选你」。这就是我每次交付的标准。</p>
-      <p>目前主力工具是 Figma 和 Canva，交付快、改稿少、无限次微调直到你满意。</p>
+      <p>DESIGNER-X 是一个独立设计系统——融合视觉设计与AI辅助文案引擎。与纯设计师不同，我输出的不是图，是「视觉+文字」的完整品牌包。</p>
+      <p>方法论：最小化设计原则——用最少的元素传递最强的信号。每一个像素、每一个字，都服务于「被记住」这一个目标。</p>
+      <p>技术栈：Figma / Canva / AI文案引擎。极速交付、无限迭代、不改到满意不停止。</p>
       <div class="tool-tags">
-        <span class="tool-tag">Figma</span>
-        <span class="tool-tag">Canva</span>
-        <span class="tool-tag">稿定设计</span>
-        <span class="tool-tag">文案策划</span>
+        <span class="tool-tag">◈ Figma</span>
+        <span class="tool-tag">◈ Canva</span>
+        <span class="tool-tag">◈ 稿定设计</span>
+        <span class="tool-tag">◈ AI文案引擎</span>
       </div>
     </div>
     <div class="about-highlights">
@@ -440,21 +541,87 @@ footer {
 
 <section id="contact">
   <div class="contact-box">
-    <h3>聊一聊你的项目</h3>
-    <p>无论你是需要一个Logo、一组封面，还是一整套品牌方案，都可以加我微信免费聊一聊，不收费、不催单。</p>
+    <h3>发起连接请求</h3>
+    <p>发送你的需求，24h内返回方案。免费诊断、不收费、不催单。</p>
     <div class="contact-wechat">
       <span>💬</span>
-      <span>微信：YourWeChatID</span>
+      <span>通讯端口：WeChat_ID</span>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>© 2026 你的名字 · 独立设计工作室</p>
+  <p>© 2026 DESIGNER-X // SYS::v2.0 · 独立设计系统</p>
 </footer>
 
 <script>
-// Smooth scroll for nav links
+// Typewriter effect
+const phrases = [
+  '数字视觉设计 · AI文案引擎',
+  '品牌系统构建中...',
+  '视觉+文字 完整交付',
+  'SYS::READY'
+];
+let phraseIdx = 0, charIdx = 0, isDeleting = false;
+const tw = document.getElementById('typewriter');
+
+function type() {
+  const current = phrases[phraseIdx];
+  if (isDeleting) {
+    tw.textContent = current.substring(0, charIdx - 1);
+    charIdx--;
+  } else {
+    tw.textContent = current.substring(0, charIdx + 1);
+    charIdx++;
+  }
+  if (!isDeleting && charIdx === current.length) {
+    setTimeout(() => { isDeleting = true; }, 2000);
+  } else if (isDeleting && charIdx === 0) {
+    isDeleting = false;
+    phraseIdx = (phraseIdx + 1) % phrases.length;
+  }
+  const speed = isDeleting ? 40 : 80;
+  setTimeout(type, speed);
+}
+type();
+
+// Scroll reveal
+const revealEls = document.querySelectorAll(
+  '.portfolio-card, .service-card, .highlight-box, .about-text p, .section-title, .section-desc'
+);
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+revealEls.forEach(el => {
+  el.classList.add('reveal');
+  observer.observe(el);
+});
+
+// Section labels also reveal
+document.querySelectorAll('.section-label').forEach(el => {
+  el.classList.add('reveal');
+  observer.observe(el);
+});
+
+// Mouse glow effect
+const glow = document.createElement('div');
+glow.className = 'glow-trail';
+document.body.appendChild(glow);
+let glowTimeout;
+document.addEventListener('mousemove', (e) => {
+  glow.style.left = e.clientX + 'px';
+  glow.style.top = e.clientY + 'px';
+  glow.style.opacity = '1';
+  clearTimeout(glowTimeout);
+  glowTimeout = setTimeout(() => { glow.style.opacity = '0'; }, 600);
+});
+
+// Smooth scroll for nav
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();
