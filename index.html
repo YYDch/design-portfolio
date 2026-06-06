@@ -394,6 +394,116 @@ nav::after {
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
+
+/* ── Gen-Z Interactive Effects ── */
+
+/* Hide default cursor */
+body { cursor: none; }
+a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat { cursor: none; }
+
+/* Custom cursor */
+.cursor-dot {
+  position: fixed; pointer-events: none; z-index: 10000;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow), 0 0 24px var(--accent-glow);
+  transform: translate(-50%, -50%);
+  transition: width 0.15s, height 0.15s, background 0.15s;
+}
+.cursor-ring {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid rgba(0,212,255,0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              height 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.25s;
+}
+.cursor-dot.hover { width: 14px; height: 14px; background: #fff; }
+.cursor-ring.hover {
+  width: 50px; height: 50px;
+  border-color: rgba(0,212,255,0.8);
+  border-width: 2px;
+  animation: ring-pulse 0.8s ease-out infinite;
+}
+@keyframes ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+}
+
+/* Click particles */
+.click-particle {
+  position: fixed; pointer-events: none; z-index: 10001;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent);
+  animation: particle-burst 0.7s ease-out forwards;
+}
+@keyframes particle-burst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+}
+
+/* 3D Card Tilt */
+.portfolio-card {
+  transform-style: preserve-3d;
+  perspective: 800px;
+  transition: transform 0.1s ease-out, box-shadow 0.3s, border-color 0.3s;
+}
+.portfolio-card .card-img,
+.portfolio-card .card-body {
+  transform: translateZ(20px);
+}
+
+/* Magnetic buttons */
+.btn {
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background 0.25s, box-shadow 0.25s;
+}
+
+/* Counter animation */
+.highlight-box .number { transition: all 0.3s; }
+.highlight-box .number.counting {
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Bouncy section enter */
+@keyframes bounce-in {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.reveal.visible {
+  animation: bounce-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Hero parallax */
+.hero h1 { transition: transform 0.1s ease-out; }
+
+/* Service card tilt */
+.service-card {
+  transform-style: preserve-3d;
+  perspective: 600px;
+  transition: transform 0.15s ease-out, box-shadow 0.3s, border-color 0.3s, background 0.3s;
+}
+.service-card .svc-icon,
+.service-card .svc-title,
+.service-card .svc-price,
+.service-card .svc-desc {
+  transform: translateZ(15px);
+}
+
+/* Ripple effect on click for buttons */
+.btn-ripple {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: scale(0);
+  animation: ripple-out 0.6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-out {
+  to { transform: scale(4); opacity: 0; }
+}
+
 </style>
 </head>
 <body>
@@ -555,73 +665,190 @@ nav::after {
 </footer>
 
 <script>
-// Typewriter effect
-const phrases = [
-  '数字视觉设计 · AI文案引擎',
-  '品牌系统构建中...',
-  '视觉+文字 完整交付',
-  'SYS::READY'
-];
+// ═══════════════════════════
+//  GEN-Z INTERACTIONS ENGINE
+// ═══════════════════════════
+
+// ── Custom Cursor ──
+const dot = document.createElement('div'); dot.className = 'cursor-dot';
+const ring = document.createElement('div'); ring.className = 'cursor-ring';
+document.body.appendChild(dot); document.body.appendChild(ring);
+
+let mouseX = 0, mouseY = 0;
+let dotX = 0, dotY = 0;
+let ringX = 0, ringY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX; mouseY = e.clientY;
+  dot.style.left = mouseX + 'px';
+  dot.style.top = mouseY + 'px';
+});
+
+function animateCursor() {
+  ringX += (mouseX - ringX) * 0.15;
+  ringY += (mouseY - ringY) * 0.15;
+  ring.style.left = ringX + 'px';
+  ring.style.top = ringY + 'px';
+  requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Hover detection
+const hoverTargets = document.querySelectorAll('a, button, .btn, .portfolio-card, .service-card, .highlight-box, .contact-wechat');
+hoverTargets.forEach(el => {
+  el.addEventListener('mouseenter', () => { dot.classList.add('hover'); ring.classList.add('hover'); });
+  el.addEventListener('mouseleave', () => { dot.classList.remove('hover'); ring.classList.remove('hover'); });
+});
+
+// ── Click Particle Burst ──
+document.addEventListener('click', (e) => {
+  const count = 12;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'click-particle';
+    const angle = (Math.PI * 2 * i) / count;
+    const dist = 30 + Math.random() * 40;
+    p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+    p.style.left = e.clientX + 'px';
+    p.style.top = e.clientY + 'px';
+    p.style.background = i % 2 === 0 ? 'var(--accent)' : '#fff';
+    p.style.width = (3 + Math.random() * 4) + 'px';
+    p.style.height = p.style.width;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+
+  // Ripple on buttons
+  if (e.target.closest('.btn')) {
+    const btn = e.target.closest('.btn');
+    const ripple = document.createElement('span');
+    ripple.className = 'btn-ripple';
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+    btn.style.position = btn.style.position || 'relative';
+    btn.style.overflow = 'hidden';
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
+});
+
+// ── 3D Card Tilt ──
+document.querySelectorAll('.portfolio-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+  });
+});
+
+// ── Magnetic Buttons ──
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0, 0)';
+  });
+});
+
+// ── Service Card Tilt ──
+document.querySelectorAll('.service-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2, cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -5;
+    const rotateY = ((x - cx) / cx) * 5;
+    card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(600px) rotateX(0) rotateY(0)';
+  });
+});
+
+// ── Counter Animation ──
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const targetText = el.textContent;
+      const targetNum = parseInt(targetText);
+      if (isNaN(targetNum)) return;
+      const suffix = targetText.replace(/[0-9]/g, '');
+      const duration = 1500;
+      const start = performance.now();
+      el.classList.add('counting');
+      function tick(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(eased * targetNum);
+        el.textContent = current + suffix;
+        if (progress < 1) requestAnimationFrame(tick);
+        else { el.textContent = targetText; el.classList.remove('counting'); }
+      }
+      requestAnimationFrame(tick);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.highlight-box .number').forEach(el => {
+  counterObserver.observe(el);
+});
+
+// ── Hero Parallax ──
+const heroH1 = document.querySelector('.hero h1');
+if (heroH1) {
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 10;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    heroH1.style.transform = `translate(${x}px, ${y}px)`;
+  });
+}
+
+// ── Typewriter ──
+const phrases = ['数字视觉设计 · AI文案引擎', '品牌系统构建中...', '视觉+文字 完整交付', 'SYS::READY'];
 let phraseIdx = 0, charIdx = 0, isDeleting = false;
 const tw = document.getElementById('typewriter');
-
 function type() {
   const current = phrases[phraseIdx];
-  if (isDeleting) {
-    tw.textContent = current.substring(0, charIdx - 1);
-    charIdx--;
-  } else {
-    tw.textContent = current.substring(0, charIdx + 1);
-    charIdx++;
-  }
-  if (!isDeleting && charIdx === current.length) {
-    setTimeout(() => { isDeleting = true; }, 2000);
-  } else if (isDeleting && charIdx === 0) {
-    isDeleting = false;
-    phraseIdx = (phraseIdx + 1) % phrases.length;
-  }
-  const speed = isDeleting ? 40 : 80;
-  setTimeout(type, speed);
+  tw.textContent = isDeleting
+    ? current.substring(0, Math.max(0, charIdx - 1))
+    : current.substring(0, charIdx + 1);
+  if (isDeleting) charIdx--; else charIdx++;
+  if (!isDeleting && charIdx === current.length) setTimeout(() => { isDeleting = true; }, 2000);
+  else if (isDeleting && charIdx === 0) { isDeleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; }
+  setTimeout(type, isDeleting ? 35 : 75);
 }
 type();
 
-// Scroll reveal
-const revealEls = document.querySelectorAll(
-  '.portfolio-card, .service-card, .highlight-box, .about-text p, .section-title, .section-desc'
-);
-const observer = new IntersectionObserver((entries) => {
+// ── Scroll Reveal ──
+const revealEls = document.querySelectorAll('.portfolio-card, .service-card, .highlight-box, .section-title, .section-desc, .section-label');
+const scrollObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-    }
+    if (entry.isIntersecting) entry.target.classList.add('visible');
   });
-}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+revealEls.forEach(el => { el.classList.add('reveal'); scrollObserver.observe(el); });
 
-revealEls.forEach(el => {
-  el.classList.add('reveal');
-  observer.observe(el);
-});
-
-// Section labels also reveal
-document.querySelectorAll('.section-label').forEach(el => {
-  el.classList.add('reveal');
-  observer.observe(el);
-});
-
-// Mouse glow effect
-const glow = document.createElement('div');
-glow.className = 'glow-trail';
-document.body.appendChild(glow);
-let glowTimeout;
-document.addEventListener('mousemove', (e) => {
-  glow.style.left = e.clientX + 'px';
-  glow.style.top = e.clientY + 'px';
-  glow.style.opacity = '1';
-  clearTimeout(glowTimeout);
-  glowTimeout = setTimeout(() => { glow.style.opacity = '0'; }, 600);
-});
-
-// Smooth scroll for nav
+// ── Smooth Scroll ──
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();
